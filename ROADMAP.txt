@@ -1,0 +1,4 @@
+This is going to be simple online code editor for code interviews
+
+* Based on websocket
+* Implement SSO authorization
