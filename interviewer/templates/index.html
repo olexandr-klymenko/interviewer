@@ -1,0 +1,9 @@
+{% include 'header.html' %}
+<body>
+<button id="Start">Start editor</button>
+<script type="text/javascript">
+    document.getElementById("Start").onclick = function () {
+        location.href = "/{{ session_id }}/";
+    };
+</script>
+{% include 'footer.html' %}
