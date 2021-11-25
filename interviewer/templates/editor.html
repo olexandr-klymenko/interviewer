@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 <div>
-    <textarea class="language-python" cols="80" rows="25" id="editor">import this</textarea>
+    <textarea class="language-python" cols="80" rows="25" id="editor" name="{{ session_id }}">import this</textarea>
 </div>
 <div><textarea class="language-python" cols="80" rows="4" id="terminal" disabled></textarea></div>
 <script type="text/javascript" src="{{ url_for('static', path='/js/editor.js') }}"></script>
