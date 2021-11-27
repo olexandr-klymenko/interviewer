@@ -13,19 +13,21 @@ from loguru import logger
 
 from aioredis import from_url
 
-SESSIONS = "SESSIONS_"
+SESSIONS = "SESSIONS"
 
 
-class WebSocketSessions:
+class EditorSessions:
     def __init__(self):
         self._info: Dict[str, Dict[str, WebSocket]] = defaultdict(dict)
 
     def add(self, session_id, socket_id, socket):
         self._info[session_id].update({socket_id: socket})
 
-    def sockets_by_session(self, session_id, socket_id) -> List[WebSocket]:
+    def target_sockets(self, session_id, source_socket_id) -> List[WebSocket]:
         return [
-            socket for _id, socket in self._info[session_id].items() if _id != socket_id
+            socket
+            for _id, socket in self._info[session_id].items()
+            if _id != source_socket_id
         ]
 
     def sockets(self, session_id):
@@ -34,11 +36,17 @@ class WebSocketSessions:
     def remove_socket(self, session_id, socket_id):
         self._info[session_id].pop(socket_id)
 
+    async def echo(self, session_id, source_socket_id, data):
+        for socket in self.target_sockets(
+            session_id=session_id, source_socket_id=source_socket_id
+        ):
+            await socket.send_text(data)
 
-web_socket_sessions = WebSocketSessions()
+
+editor_sessions = EditorSessions()
 
 
-redis = from_url("redis://localhost", encoding="utf-8", decode_responses=True)
+redis = from_url("redis://redis", encoding="utf-8", decode_responses=True)
 
 app = FastAPI(debug=True)
 origins = [
@@ -80,7 +88,7 @@ async def editor(request: Request, session_id: str):
 @app.websocket("/editor_ws/{session_id}")
 async def editor_web_socket(websocket: WebSocket, session_id: str):
     socket_id = str(uuid4())
-    web_socket_sessions.add(
+    editor_sessions.add(
         session_id=session_id, socket_id=socket_id, socket=websocket
     )
     await websocket.accept()
@@ -89,14 +97,14 @@ async def editor_web_socket(websocket: WebSocket, session_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            logger.info(f"Received: {data}")
-            logger.info(web_socket_sessions.sockets(session_id=session_id))
-            for socket in web_socket_sessions.sockets_by_session(
-                session_id=session_id, socket_id=socket_id
-            ):
-                await socket.send_text(data)
+            await editor_sessions.echo(
+                session_id=session_id,
+                source_socket_id=socket_id,
+                data=data,
+            )
+
     except WebSocketDisconnect:
-        web_socket_sessions.remove_socket(session_id=session_id, socket_id=socket_id)
+        editor_sessions.remove_socket(session_id=session_id, socket_id=socket_id)
 
 
 if __name__ == "__main__":
