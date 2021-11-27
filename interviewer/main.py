@@ -16,34 +16,31 @@ from aioredis import from_url
 SESSIONS = "SESSIONS"
 
 
-class EditorSessions:
+class Sessions:
     def __init__(self):
         self._info: Dict[str, Dict[str, WebSocket]] = defaultdict(dict)
 
     def add(self, session_id, socket_id, socket):
         self._info[session_id].update({socket_id: socket})
 
-    def target_sockets(self, session_id, source_socket_id) -> List[WebSocket]:
+    async def echo(self, session_id, source_socket_id, data):
+        for socket in self._target_sockets(
+            session_id=session_id, source_socket_id=source_socket_id
+        ):
+            await socket.send_text(data)
+
+    def _target_sockets(self, session_id, source_socket_id) -> List[WebSocket]:
         return [
             socket
             for _id, socket in self._info[session_id].items()
             if _id != source_socket_id
         ]
 
-    def sockets(self, session_id):
-        return list(self._info[session_id].keys())
-
     def remove_socket(self, session_id, socket_id):
         self._info[session_id].pop(socket_id)
 
-    async def echo(self, session_id, source_socket_id, data):
-        for socket in self.target_sockets(
-            session_id=session_id, source_socket_id=source_socket_id
-        ):
-            await socket.send_text(data)
 
-
-editor_sessions = EditorSessions()
+editor_sessions = Sessions()
 
 
 redis = from_url("redis://redis", encoding="utf-8", decode_responses=True)
@@ -97,6 +94,7 @@ async def editor_web_socket(websocket: WebSocket, session_id: str):
     try:
         while True:
             data = await websocket.receive_text()
+            await redis.hset(SESSIONS, session_id, data)
             await editor_sessions.echo(
                 session_id=session_id,
                 source_socket_id=socket_id,
