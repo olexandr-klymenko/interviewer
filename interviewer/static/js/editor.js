@@ -12,7 +12,6 @@ function startEditor() {
     let outputTextarea = document.getElementById(OUTPUT_ID);
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = editorTextarea.getAttribute("name");
-    console.log("Starting session: " + session_id);
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
     let outputSocket = new WebSocket(OUTPUT_WS_URL + session_id);
 
@@ -27,14 +26,19 @@ function startEditor() {
     editorTextarea.onchange = () => {
         editorSocket.send(editorTextarea.value);
     }
+
     runButton.onclick = () => {
-        console.log("Run button click")
-        const Http = new XMLHttpRequest();
-        Http.open("GET", EXECUTE_URL + session_id);
-        Http.send();
-        Http.onreadystatechange = (e) => {
-          console.log(Http.responseText)
-        }
+        editorTextarea.disable = true;
+        let myInit = {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default'
+        };
+        let myRequest = new Request(EXECUTE_URL + session_id, myInit);
+        fetch(myRequest).then(function (response) {
+            console.log(response.statusText);
+            editorTextarea.disable = false;
+        });
     }
 }
 
