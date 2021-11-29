@@ -1,3 +1,6 @@
+* implement github actions for deployment
+* README documentation for local deployment
+* implement integration and e2e testing
 * limit memory consumption of execution
 * implement readonly/readwrite access to the editor
 * implement status bar / execution time report
