@@ -1,0 +1,7 @@
+* limit memory consumption of execution
+* implement readonly/readwrite access to the editor
+* implement status bar / execution time report
+* extract execution into separate service with redis pubsub
+* implement Google SSO
+* implement syntax highlighting
+* implement code completion

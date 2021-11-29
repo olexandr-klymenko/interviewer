@@ -9,7 +9,11 @@ up:
 down:
 	docker-compose down
 
-restart: down build up
+app_restart:
+	docker-compose stop interviewer
+	docker-compose start interviewer
+
+restart: build app_restart
 
 logs:
 	docker-compose logs -f
