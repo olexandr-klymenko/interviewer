@@ -28,7 +28,8 @@ function startEditor() {
     }
 
     runButton.onclick = () => {
-        editorTextarea.disable = true;
+        runButton.disabled = true;
+        editorTextarea.disabled = true;
         let myInit = {
             method: 'GET',
             mode: 'cors',
@@ -37,7 +38,8 @@ function startEditor() {
         let myRequest = new Request(EXECUTE_URL + session_id, myInit);
         fetch(myRequest).then(function (response) {
             console.log(response.statusText);
-            editorTextarea.disable = false;
+            runButton.disabled = false;
+            editorTextarea.disabled = false;
         });
     }
 }
