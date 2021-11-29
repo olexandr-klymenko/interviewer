@@ -19,6 +19,10 @@ function startEditor() {
         editorTextarea.value = event.data;
     }
 
+    editorSocket.onclose = () => {
+        runButton.disabled = true;
+    }
+
     outputSocket.onmessage = (event) => {
         outputTextarea.value = event.data;
     }
