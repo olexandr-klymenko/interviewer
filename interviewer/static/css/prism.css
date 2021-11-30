@@ -94,3 +94,7 @@ pre[class*=language-] {
 .token.deleted {
     color: red
 }
+
+.timeTextarea {
+   resize: none;
+}

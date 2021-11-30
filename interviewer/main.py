@@ -1,8 +1,10 @@
 import os
+from dataclasses import dataclass
 import subprocess
 from collections import defaultdict
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
+from time import time
 from typing import Dict, List
 
 import uvicorn
@@ -31,7 +33,7 @@ class Sessions:
         for socket in self._target_sockets(
             session_id=session_id, source_socket_id=source_socket_id
         ):
-            await socket.send_text(data)
+            await socket.send_json(data)
 
     def _target_sockets(self, session_id, source_socket_id=None) -> List[WebSocket]:
         return [
@@ -62,19 +64,37 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
-def execute(session_id, code):
+@dataclass
+class ExecuteData:
+    stdout: str
+    stderr: str
+    execution_time: float = 0.0
+
+    def output(self) -> Dict[str, float]:
+        return {
+            "output": self.stdout or self.stderr,
+            "time": self.execution_time
+        }
+
+
+def execute(session_id: str, code: bytes) -> ExecuteData:
     tmp_file = NamedTemporaryFile(prefix=session_id, delete=False)
     try:
         tmp_file.write(code)
         tmp_file.close()
+        start_time = time()
         completed = subprocess.run(
-            ["python3", tmp_file.name], capture_output=True, timeout=EXECUTION_TIME_LIMIT
+            ["python3", tmp_file.name],
+            capture_output=True,
+            timeout=EXECUTION_TIME_LIMIT,
         )
-        return completed.stdout.decode(), completed.stderr.decode()
-    except subprocess.TimeoutExpired as err:
-        return "", str(err)
-    except Exception as err:
-        return "", str(err)
+        return ExecuteData(
+            stdout=completed.stdout.decode(),
+            stderr=completed.stderr.decode(),
+            execution_time=time() - start_time,
+        )
+    except (subprocess.TimeoutExpired, Exception) as err:
+        return ExecuteData(stdout="", stderr=str(err))
     finally:
         os.unlink(tmp_file.name)
 
@@ -104,9 +124,8 @@ async def editor(request: Request, session_id: str):
 async def run(session_id: str):
     if await redis.hexists(SESSIONS, session_id):
         code = await redis.hget(SESSIONS, session_id)
-        stdout, stderr = execute(session_id=session_id, code=code.encode())
-        output = stderr or stdout
-        await output_sessions.echo(output, session_id=session_id)
+        execution_info = execute(session_id=session_id, code=code.encode())
+        await output_sessions.echo(execution_info.output(), session_id=session_id)
         return Response(status_code=200)
     return Response(status_code=404)
 

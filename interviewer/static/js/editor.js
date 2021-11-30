@@ -1,5 +1,6 @@
 const EDITOR_ID = "editor";
 const OUTPUT_ID = "output";
+const TIME_ID = "time";
 
 const RUN_BUTTON_ID = "run_button";
 const EDITOR_WS_URL = "ws://localhost:8000/editor_ws/";
@@ -10,6 +11,7 @@ const EXECUTE_URL = "http://localhost:8000/run/";
 function startEditor() {
     let editorTextarea = document.getElementById(EDITOR_ID);
     let outputTextarea = document.getElementById(OUTPUT_ID);
+    let executionTimeLine = document.getElementById(TIME_ID);
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = editorTextarea.getAttribute("name");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
@@ -24,7 +26,10 @@ function startEditor() {
     }
 
     outputSocket.onmessage = (event) => {
-        outputTextarea.value = event.data;
+        let executionInfo = JSON.parse(event.data);
+        outputTextarea.value = executionInfo.output;
+        executionTimeLine.value = executionInfo.time;
+        console.log(executionInfo.time);
     }
 
     editorTextarea.onchange = () => {
