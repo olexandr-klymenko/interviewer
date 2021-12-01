@@ -1,11 +1,9 @@
 {% include 'header.html' %}
 <button id="run_button">Run</button>
-<form>
-    <div>
-        <textarea class="language-python" cols="80" id="editor" name="{{ session_id }}" rows="25">import this</textarea>
-    </div>
-    <div><textarea cols="80" disabled id="output" rows="4"></textarea></div>
-    <div><textarea class="timeTextarea" cols="80" disabled id="time" rows="1"></textarea></div>
-</form>
-<script src="{{ url_for('static', path='/js/editor.js') }}" type="text/javascript"></script>
+<div>
+      <textarea id="editor" name="{{ session_id }}" cols="80" rows="25">import this</textarea>
+</div>
+{% include 'output.html' %}
+{% include 'time.html' %}
 {% include 'footer.html' %}
+<script src="{{ url_for('static', path='/js/editor.js') }}"></script>

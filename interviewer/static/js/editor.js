@@ -29,7 +29,6 @@ function startEditor() {
         let executionInfo = JSON.parse(event.data);
         outputTextarea.value = executionInfo.output;
         executionTimeLine.value = executionInfo.time;
-        console.log(executionInfo.time);
     }
 
     editorTextarea.onchange = () => {
