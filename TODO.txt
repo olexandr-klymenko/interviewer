@@ -3,8 +3,8 @@
 * implement integration and e2e testing
 * limit memory consumption of execution
 * implement readonly/readwrite access to the editor
-* implement status bar / execution time report
+* implement status bar / execution time report - WIP
 * extract execution into separate service with redis pubsub
 * implement Google SSO
-* implement syntax highlighting
+* implement syntax highlighting - WIP
 * implement code completion

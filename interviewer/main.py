@@ -33,7 +33,10 @@ class Sessions:
         for socket in self._target_sockets(
             session_id=session_id, source_socket_id=source_socket_id
         ):
-            await socket.send_json(data)
+            if isinstance(data, str):
+                await socket.send_text(data)
+            if isinstance(data, dict):
+                await socket.send_json(data)
 
     def _target_sockets(self, session_id, source_socket_id=None) -> List[WebSocket]:
         return [
@@ -71,10 +74,7 @@ class ExecuteData:
     execution_time: float = 0.0
 
     def output(self) -> Dict[str, float]:
-        return {
-            "output": self.stdout or self.stderr,
-            "time": self.execution_time
-        }
+        return {"output": self.stdout or self.stderr, "time": self.execution_time}
 
 
 def execute(session_id: str, code: bytes) -> ExecuteData:
@@ -102,8 +102,7 @@ def execute(session_id: str, code: bytes) -> ExecuteData:
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     session_id = str(uuid4())
-    res = await redis.hset(SESSIONS, session_id, "")
-    logger.info(res)
+    await redis.hset(SESSIONS, session_id, "")
     page = templates.TemplateResponse(
         "index.html", context={"request": request, "session_id": session_id}
     )

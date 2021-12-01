@@ -1,9 +1,10 @@
 {% include 'header.html' %}
 <button id="run_button">Run</button>
-<div>
-      <textarea id="editor" name="{{ session_id }}" cols="80" rows="25">import this</textarea>
+<div class="frame">
+      <textarea id="editor" cols="80" rows="25"></textarea>
 </div>
 {% include 'output.html' %}
 {% include 'time.html' %}
 {% include 'footer.html' %}
 <script src="{{ url_for('static', path='/js/editor.js') }}"></script>
+<!--TODO: Make frame with beasels-->

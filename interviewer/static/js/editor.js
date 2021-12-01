@@ -10,15 +10,19 @@ const EXECUTE_URL = "http://localhost:8000/run/";
 
 function startEditor() {
     let editorTextarea = document.getElementById(EDITOR_ID);
+    let myCodeMirror = CodeMirror.fromTextArea(editorTextarea);
     let outputTextarea = document.getElementById(OUTPUT_ID);
     let executionTimeLine = document.getElementById(TIME_ID);
     let runButton = document.getElementById(RUN_BUTTON_ID);
-    let session_id = editorTextarea.getAttribute("name");
+    let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
     let outputSocket = new WebSocket(OUTPUT_WS_URL + session_id);
+    let incomeText = "";
 
     editorSocket.onmessage = (event) => {
-        editorTextarea.value = event.data;
+        let code = event.data
+        incomeText = code;
+        myCodeMirror.setValue(code)
     }
 
     editorSocket.onclose = () => {
@@ -31,13 +35,19 @@ function startEditor() {
         executionTimeLine.value = executionInfo.time;
     }
 
-    editorTextarea.onchange = () => {
-        editorSocket.send(editorTextarea.value);
-    }
+    myCodeMirror.on(
+        "change",
+        function () {
+            let code = myCodeMirror.getValue();
+            if (code !== incomeText) {
+                editorSocket.send(myCodeMirror.getValue())
+            }
+        }
+    )
 
     runButton.onclick = () => {
         runButton.disabled = true;
-        editorTextarea.disabled = true;
+        myCodeMirror.disabled = true;
         let myInit = {
             method: 'GET',
             mode: 'cors',
@@ -45,9 +55,8 @@ function startEditor() {
         };
         let myRequest = new Request(EXECUTE_URL + session_id, myInit);
         fetch(myRequest).then(function (response) {
-            console.log(response.statusText);
             runButton.disabled = false;
-            editorTextarea.disabled = false;
+            myCodeMirror.disabled = false;
         });
     }
 }
