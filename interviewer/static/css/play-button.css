@@ -2,11 +2,11 @@
     box-sizing: border-box;
     position: relative;
     display: block;
-    transform: scale(var(--ggs,1));
     width: 22px;
     height: 22px;
     border: 2px solid;
-    border-radius: 4px
+    border-radius: 4px;
+    margin: 2px;
 }
 .gg-play-button-r::before {
     content: "";

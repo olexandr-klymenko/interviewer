@@ -18,7 +18,7 @@ function startEditor() {
     let outputCodeMirror = CodeMirror(document.getElementById(OUTPUT_ID), {
         readOnly: true,
     });
-    outputCodeMirror.setSize(1000, 200)
+    outputCodeMirror.setSize(1000, 200);
     let timeCodeMirror = CodeMirror(document.getElementById(TIME_ID), {
         readOnly: true,
         theme: "darcula",
