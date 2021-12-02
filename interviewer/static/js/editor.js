@@ -1,4 +1,4 @@
-const EDITOR_ID = "editor";
+const EDITOR_ID = "code";
 const OUTPUT_ID = "output";
 const TIME_ID = "time";
 
@@ -9,14 +9,19 @@ const EXECUTE_URL = "http://localhost:8000/run/";
 
 
 function startEditor() {
-    let editorTextarea = document.getElementById(EDITOR_ID);
-    let myCodeMirror = CodeMirror.fromTextArea(editorTextarea, {
+    let editorCodeMirror = CodeMirror(document.getElementById(EDITOR_ID), {
         lineNumbers: true,
         mode: "python",
         theme: "darcula",
     });
-    let outputTextarea = document.getElementById(OUTPUT_ID);
-    let executionTimeLine = document.getElementById(TIME_ID);
+    let outputCodeMirror = CodeMirror(document.getElementById(OUTPUT_ID), {
+        mode: "python",
+        readOnly: true,
+    });
+    let timeCodeMirror = CodeMirror(document.getElementById(TIME_ID), {
+        mode: "python",
+        readOnly: true,
+    });
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
@@ -26,7 +31,7 @@ function startEditor() {
     editorSocket.onmessage = (event) => {
         let code = event.data
         incomeText = code;
-        myCodeMirror.setValue(code)
+        editorCodeMirror.setValue(code)
     }
 
     editorSocket.onclose = () => {
@@ -35,23 +40,23 @@ function startEditor() {
 
     outputSocket.onmessage = (event) => {
         let executionInfo = JSON.parse(event.data);
-        outputTextarea.value = executionInfo.output;
-        executionTimeLine.value = executionInfo.time;
+        outputCodeMirror.setValue(executionInfo.output);
+        timeCodeMirror.setValue(executionInfo.time);
     }
 
-    myCodeMirror.on(
+    editorCodeMirror.on(
         "change",
         function () {
-            let code = myCodeMirror.getValue();
+            let code = editorCodeMirror.getValue();
             if (code !== incomeText) {
-                editorSocket.send(myCodeMirror.getValue())
+                editorSocket.send(editorCodeMirror.getValue())
             }
         }
     )
 
     runButton.onclick = () => {
         runButton.disabled = true;
-        myCodeMirror.disabled = true;
+        editorCodeMirror.disabled = true;
         let myInit = {
             method: 'GET',
             mode: 'cors',
@@ -60,7 +65,7 @@ function startEditor() {
         let myRequest = new Request(EXECUTE_URL + session_id, myInit);
         fetch(myRequest).then(function (response) {
             runButton.disabled = false;
-            myCodeMirror.disabled = false;
+            editorCodeMirror.disabled = false;
         });
     }
 }
