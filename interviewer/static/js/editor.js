@@ -59,12 +59,12 @@ function startEditor() {
     runButton.onclick = () => {
         runButton.disabled = true;
         editorCodeMirror.disabled = true;
-        let myInit = {
+        let init = {
             method: 'GET',
             mode: 'cors',
             cache: 'default'
         };
-        let myRequest = new Request(EXECUTE_URL + session_id, myInit);
+        let myRequest = new Request(EXECUTE_URL + session_id, init);
         fetch(myRequest).then(function (response) {
             runButton.disabled = false;
             editorCodeMirror.disabled = false;
