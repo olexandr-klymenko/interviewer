@@ -10,7 +10,11 @@ const EXECUTE_URL = "http://localhost:8000/run/";
 
 function startEditor() {
     let editorTextarea = document.getElementById(EDITOR_ID);
-    let myCodeMirror = CodeMirror.fromTextArea(editorTextarea);
+    let myCodeMirror = CodeMirror.fromTextArea(editorTextarea, {
+        lineNumbers: true,
+        mode: "python",
+        theme: "darcula",
+    });
     let outputTextarea = document.getElementById(OUTPUT_ID);
     let executionTimeLine = document.getElementById(TIME_ID);
     let runButton = document.getElementById(RUN_BUTTON_ID);
