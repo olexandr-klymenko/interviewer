@@ -14,14 +14,16 @@ function startEditor() {
         mode: "python",
         theme: "darcula",
     });
+    editorCodeMirror.setSize(1000, 600);
     let outputCodeMirror = CodeMirror(document.getElementById(OUTPUT_ID), {
-        mode: "python",
         readOnly: true,
     });
+    outputCodeMirror.setSize(1000, 200)
     let timeCodeMirror = CodeMirror(document.getElementById(TIME_ID), {
-        mode: "python",
         readOnly: true,
+        theme: "darcula",
     });
+    timeCodeMirror.setSize(1000, 50)
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
@@ -41,7 +43,7 @@ function startEditor() {
     outputSocket.onmessage = (event) => {
         let executionInfo = JSON.parse(event.data);
         outputCodeMirror.setValue(executionInfo.output);
-        timeCodeMirror.setValue(executionInfo.time);
+        timeCodeMirror.setValue(executionInfo.time.toString());
     }
 
     editorCodeMirror.on(
