@@ -1,8 +1,15 @@
 {% include 'header.html' %}
-<i class="gg-play-button-r" id="run_button"></i>
-<div id="code"></div>
-<div id="output"></div>
-<div id="time"></div>
-{% include 'footer.html' %}
+<div>
+    <div>
+        <button id="run_button">RUN</button>
+        <input disabled id="time" width="150">
+    </div>
+    <div>
+        <div id="code"></div>
+    </div>
+    <div>
+        <textarea disabled id="output" style="resize: none;width: 1000px;height: 150px;"></textarea>
+    </div>
+</div>
 <script src="{{ url_for('static', path='/js/editor.js') }}"></script>
-<!--TODO: Make frame with beasels-->
+{% include 'footer.html' %}

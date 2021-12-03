@@ -18,15 +18,12 @@ function startEditor() {
         // smartIndent: false,
     });
     editorCodeMirror.setSize(1000, 700);
-    let outputCodeMirror = CodeMirror(document.getElementById(OUTPUT_ID), {
-        readOnly: true,
-    });
-    outputCodeMirror.setSize(1000, 150);
-    let timeCodeMirror = CodeMirror(document.getElementById(TIME_ID), {
-        readOnly: true,
-        theme: "darcula",
-    });
-    timeCodeMirror.setSize(1000, 30)
+    let outputTextarea = document.getElementById(OUTPUT_ID);
+    // let outputCodeMirror = CodeMirror(document.getElementById(OUTPUT_ID), {
+    //     readOnly: true,
+    // });
+    // outputCodeMirror.setSize(1000, 150);
+    let timeInput = document.getElementById(TIME_ID)
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
@@ -45,8 +42,10 @@ function startEditor() {
 
     outputSocket.onmessage = (event) => {
         let executionInfo = JSON.parse(event.data);
-        outputCodeMirror.setValue(executionInfo.output);
-        timeCodeMirror.setValue(executionInfo.time.toString());
+        outputTextarea.value = executionInfo.output;
+
+        // outputCodeMirror.setValue(executionInfo.output);
+        timeInput.value = executionInfo.time.toString();
     }
 
     editorCodeMirror.on(
