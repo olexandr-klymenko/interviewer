@@ -73,8 +73,8 @@ class ExecuteData:
     stderr: str
     execution_time: float = 0.0
 
-    def output(self) -> Dict[str, float]:
-        return {"output": self.stdout or self.stderr, "time": self.execution_time}
+    def output(self) -> Dict[str, str]:
+        return {"output": self.stdout or self.stderr, "time": f"Execution time: {self.execution_time:.5f}"}
 
 
 def execute(session_id: str, code: bytes) -> ExecuteData:
@@ -127,6 +127,13 @@ async def run(session_id: str):
         await output_sessions.echo(execution_info.output(), session_id=session_id)
         return Response(status_code=200)
     return Response(status_code=404)
+
+
+@app.get("/python_version/{session_id}")
+async def python_version(session_id: str):
+    execution_info = execute(session_id=session_id, code="import sys;print(sys.version)".encode())
+    data = f"Python version: {execution_info.output()['output'].split()[0]}"
+    return Response(data)
 
 
 @app.websocket("/editor_ws/{session_id}")

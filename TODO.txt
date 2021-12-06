@@ -2,9 +2,10 @@
 * README documentation for local deployment
 * implement integration and e2e testing
 * limit memory consumption of execution
-* implement python version output
 * implement readonly/readwrite access to the editor
 * extract execution into separate service with redis pubsub
 * implement Google SSO
 * implement syntax highlighting
 * implement code completion
+* handle disconnect
+* refactor from main.py

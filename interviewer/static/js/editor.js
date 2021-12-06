@@ -1,21 +1,36 @@
 const EDITOR_ID = "code";
 const OUTPUT_ID = "output";
 const TIME_ID = "time";
+const PYTHON_VERSION_ID = "python_version";
 
 const RUN_BUTTON_ID = "run_button";
 const EDITOR_WS_URL = "ws://localhost:8000/editor_ws/";
 const OUTPUT_WS_URL = "ws://localhost:8000/output_ws/";
 const EXECUTE_URL = "http://localhost:8000/run/";
+const PYTHON_VERSION_URL = "http://localhost:8000/python_version/";
 
 
 function startEditor() {
     let editorTextarea = document.getElementById(EDITOR_ID);
     let outputTextarea = document.getElementById(OUTPUT_ID);
     let timeInput = document.getElementById(TIME_ID)
+    let pythonVersionInput = document.getElementById(PYTHON_VERSION_ID)
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
     let outputSocket = new WebSocket(OUTPUT_WS_URL + session_id);
+
+    let init = {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default'
+        };
+        let pythonVersionRequest = new Request(PYTHON_VERSION_URL + session_id, init);
+        fetch(pythonVersionRequest).then(function (response) {
+            return response.text()
+        }).then((data) => {
+            pythonVersionInput.value = data
+        });
 
     let incomeText = "";
 

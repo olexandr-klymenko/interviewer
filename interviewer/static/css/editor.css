@@ -1,0 +1,19 @@
+.execution_time {
+    width: 160px;
+    text-align:center;
+}
+
+.python_version {
+    width: 140px;
+    text-align:center;
+}
+
+.code {
+    width: 1000px;
+    height: 500px;
+}
+
+.output {
+    width: 1000px;
+    height: 150px;
+}
