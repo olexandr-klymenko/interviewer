@@ -16,6 +16,7 @@ function startEditor() {
     let session_id = window.location.pathname.replaceAll("/", "");
     let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
     let outputSocket = new WebSocket(OUTPUT_WS_URL + session_id);
+
     let incomeText = "";
 
     editorSocket.onmessage = (event) => {
@@ -46,8 +47,8 @@ function startEditor() {
             mode: 'cors',
             cache: 'default'
         };
-        let myRequest = new Request(EXECUTE_URL + session_id, init);
-        fetch(myRequest).then(function (response) {
+        let executionRequest = new Request(EXECUTE_URL + session_id, init);
+        fetch(executionRequest).then(function (response) {
             runButton.disabled = false;
             editorTextarea.disabled = false;
         });
