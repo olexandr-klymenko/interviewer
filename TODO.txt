@@ -2,9 +2,9 @@
 * README documentation for local deployment
 * implement integration and e2e testing
 * limit memory consumption of execution
+* implement python version output
 * implement readonly/readwrite access to the editor
-* implement status bar / execution time report - WIP
 * extract execution into separate service with redis pubsub
 * implement Google SSO
-* implement syntax highlighting - WIP
+* implement syntax highlighting
 * implement code completion

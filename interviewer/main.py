@@ -14,6 +14,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.websockets import WebSocket, WebSocketDisconnect
+from loguru import logger
 
 from aioredis import from_url
 
@@ -138,6 +139,7 @@ async def editor_web_socket(websocket: WebSocket, session_id: str):
     try:
         while True:
             data = await websocket.receive_text()
+            logger.info(f"Received: {data}")
             await redis.hset(SESSIONS, session_id, data)
             await editor_sessions.echo(
                 session_id=session_id,
