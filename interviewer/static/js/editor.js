@@ -5,10 +5,11 @@ const PYTHON_VERSION_ID = "python_version";
 const RUN_BUTTON_ID = "run_button";
 const BACKEND_PORT = "8000";
 
-const EDITOR_WS_URL = "ws://" + window.location.hostname + ":" + BACKEND_PORT + "/editor_ws/";
-const OUTPUT_WS_URL = "ws://" + window.location.hostname + ":" + BACKEND_PORT + "/output_ws/";
-const EXECUTE_URL = "http://" + window.location.hostname + ":" + BACKEND_PORT + "/run/";
-const PYTHON_VERSION_URL = "http://" + window.location.hostname + ":" + BACKEND_PORT + "/python_version/";
+const HOSTNAME = window.location.hostname;
+const EDITOR_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/editor_ws/";
+const OUTPUT_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/output_ws/";
+const EXECUTE_URL = "http://" + HOSTNAME + ":" + BACKEND_PORT + "/run/";
+const PYTHON_VERSION_URL = "http://" + HOSTNAME + ":" + BACKEND_PORT + "/python_version/";
 
 
 function startEditor() {
