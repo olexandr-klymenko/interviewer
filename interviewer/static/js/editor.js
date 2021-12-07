@@ -2,12 +2,13 @@ const EDITOR_ID = "code";
 const OUTPUT_ID = "output";
 const TIME_ID = "time";
 const PYTHON_VERSION_ID = "python_version";
-
 const RUN_BUTTON_ID = "run_button";
-const EDITOR_WS_URL = "ws://localhost:8000/editor_ws/";
-const OUTPUT_WS_URL = "ws://localhost:8000/output_ws/";
-const EXECUTE_URL = "http://localhost:8000/run/";
-const PYTHON_VERSION_URL = "http://localhost:8000/python_version/";
+const BACKEND_PORT = "8000";
+
+const EDITOR_WS_URL = "ws://" + window.location.hostname + ":" + BACKEND_PORT + "/editor_ws/";
+const OUTPUT_WS_URL = "ws://" + window.location.hostname + ":" + BACKEND_PORT + "/output_ws/";
+const EXECUTE_URL = "http://" + window.location.hostname + ":" + BACKEND_PORT + "/run/";
+const PYTHON_VERSION_URL = "http://" + window.location.hostname + ":" + BACKEND_PORT + "/python_version/";
 
 
 function startEditor() {

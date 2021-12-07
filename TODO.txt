@@ -9,3 +9,4 @@
 * implement code completion
 * handle disconnect
 * refactor from main.py
+* implement HTTPS
