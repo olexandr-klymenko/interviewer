@@ -8,5 +8,5 @@
 * implement syntax highlighting
 * implement code completion
 * handle disconnect
-* refactor from main.py
 * implement HTTPS
+* implement git hooks with linters

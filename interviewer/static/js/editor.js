@@ -6,8 +6,8 @@ const RUN_BUTTON_ID = "run_button";
 const BACKEND_PORT = "8000";
 
 const HOSTNAME = window.location.hostname;
-const EDITOR_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/editor_ws/";
-const OUTPUT_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/output_ws/";
+const EDITOR_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/editor_ws";
+const OUTPUT_WS_URL = "ws://" + HOSTNAME + ":" + BACKEND_PORT + "/output_ws";
 const EXECUTE_URL = "http://" + HOSTNAME + ":" + BACKEND_PORT + "/run/";
 const PYTHON_VERSION_URL = "http://" + HOSTNAME + ":" + BACKEND_PORT + "/python_version/";
 
@@ -19,8 +19,8 @@ function startEditor() {
     let pythonVersionInput = document.getElementById(PYTHON_VERSION_ID)
     let runButton = document.getElementById(RUN_BUTTON_ID);
     let session_id = window.location.pathname.replaceAll("/", "");
-    let editorSocket = new WebSocket(EDITOR_WS_URL + session_id);
-    let outputSocket = new WebSocket(OUTPUT_WS_URL + session_id);
+    let editorSocket = new WebSocket(EDITOR_WS_URL + "?session_id=" + session_id);
+    let outputSocket = new WebSocket(OUTPUT_WS_URL + "?session_id=" + session_id);
 
     let init = {
             method: 'GET',
