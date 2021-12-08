@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="google-signin-client_id" content="647914266908-ondfaqdfcno9l56iue8t239d07si2f3c.apps.googleusercontent.com.apps.googleusercontent.com">
-    <title>Online code interview</title>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script src="{{ url_for('static', path='/js/google_login.js') }}"></script>
+{% include 'header.html' %}
 <body>
 <button id="Start">Start editor</button>
-<div class="g-signin2" data-onsuccess="onSignIn"></div>
 <script type="text/javascript">
     document.getElementById("Start").onclick = function () {
         location.href = "/{{ session_id }}/";
