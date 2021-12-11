@@ -1,11 +1,9 @@
 from fastapi import APIRouter
-from starlette.config import Config
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
+from interviewer.config import config
 from interviewer.routers.user import schemas, services
-
-config = Config("interviewer/.env")
 
 templates = Jinja2Templates(directory="interviewer/templates")
 
@@ -16,7 +14,11 @@ router = APIRouter(tags=["auth"])
 async def google_auth(request: Request):
     return templates.TemplateResponse(
         "auth.html",
-        {"request": request, "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"), "DOMAIN": request.url.hostname},
+        {
+            "request": request,
+            "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
+            "DOMAIN": request.url.hostname,
+        },
     )
 
 
