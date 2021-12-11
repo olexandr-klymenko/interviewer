@@ -15,11 +15,14 @@ down:
 	docker-compose $(ENV_CONFIG) down
 
 restart:
-	docker-compose $(ENV_CONFIG) stop interviewer
-	$(HIDE_DOCKER_CLI_DETAILES) docker-compose $(ENV_CONFIG) build
-	docker-compose $(ENV_CONFIG) start interviewer
+	docker-compose $(ENV_CONFIG) rm -f -s interviewer
+	$(HIDE_DOCKER_CLI_DETAILES) docker-compose $(ENV_CONFIG) build interviewer
+	docker-compose $(ENV_CONFIG) up -d interviewer
 
 logs:
 	docker-compose $(ENV_CONFIG) logs -f
+
+redis:
+	docker-compose $(ENV_CONFIG) up -d redis
 
 all: build up
