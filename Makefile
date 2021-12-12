@@ -25,4 +25,7 @@ logs:
 redis:
 	docker-compose $(ENV_CONFIG) up -d redis
 
+black:
+	black .
+
 all: build up
