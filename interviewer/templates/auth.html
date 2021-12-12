@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-signin-client_id"
-        content="{{ GOOGLE_CLIENT_ID }}">
+    <meta content="{{ GOOGLE_CLIENT_ID }}"
+          name="google-signin-client_id">
+    <title>Online code interview</title>
+    <script async defer onload="renderButton()" src="https://apis.google.com/js/platform.js"></script>
 </head>
 <body>
 <div id="my-signin2"></div>
-
 <script>
     function onSuccess(googleUser) {
         console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
@@ -26,11 +27,11 @@
             console.log('Signed in as: ' + xhr.responseText);
         };
         xhr.send(JSON.stringify({
-                'token':id_token,
+                'token': id_token,
                 "avatar": profile.getImageUrl(),
                 "email": profile.getEmail(),
                 "username": profile.getName()
-        })
+            })
         );
 
     }
@@ -51,6 +52,5 @@
         });
     }
 </script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 </body>
 </html>

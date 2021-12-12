@@ -4,7 +4,7 @@ from google.oauth2 import id_token
 
 from interviewer.config import config
 from interviewer.routers.user import schemas, models
-from interviewer.routers.user import tokenizator
+from interviewer.routers.user import tokenizer
 
 
 async def create_user(user: schemas.UserCreate) -> models.User:
@@ -20,5 +20,5 @@ async def google_auth(user: schemas.UserCreate) -> tuple:
     except ValueError:
         raise HTTPException(403, "Bad code")
     user = await create_user(user)
-    internal_token = tokenizator.create_token(user.id)
+    internal_token = tokenizer.create_token(user.id)
     return user.id, internal_token.get("access_token")

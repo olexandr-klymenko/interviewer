@@ -1,3 +1,11 @@
+.run_button, .execution_time, .python_version, .code, .output{
+    border-radius: 5px;
+}
+
+.run_button, .execution_time, .python_version{
+    margin-bottom: 3px;
+}
+
 .execution_time {
     width: 160px;
     text-align:center;
@@ -9,11 +17,12 @@
 }
 
 .code {
-    width: 1000px;
-    height: 500px;
+    width: 100%;
+    height: 70vh;
+    font-size: 130%;
 }
 
 .output {
-    width: 1000px;
-    height: 150px;
+    width: 100%;
+    height: 20vh;;
 }
