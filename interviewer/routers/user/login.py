@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 from fastapi.requests import Request
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewer.config import config
+from interviewer.constants import AUTH_COOKIE_NAME
 from interviewer.routers.user import schemas, services
 
 templates = Jinja2Templates(directory="interviewer/templates")
@@ -22,7 +24,16 @@ async def google_auth(request: Request):
     )
 
 
-@router.post("/google/auth", response_model=schemas.Token)
-async def google_auth(user: schemas.UserCreate):
-    user_id, token = await services.google_auth(user)
-    return schemas.Token(id=user_id, token=token)
+@router.post("/google/auth", response_model=schemas.User)
+async def google_auth(request: Request, user: schemas.User):
+    await services.google_auth(user.token)
+    response = RedirectResponse("/")
+    response.set_cookie(
+        AUTH_COOKIE_NAME,
+        value=user.token,
+        domain=request.url.hostname,
+        httponly=True,
+        max_age=1800,
+        expires=1800,
+    )
+    return response

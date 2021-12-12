@@ -1,21 +1,31 @@
 from uuid import uuid4
 
-from fastapi import APIRouter, Request
+import loguru
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewer.cache import redis
-from interviewer.constants import SESSIONS
+from interviewer.routers.user.services import google_auth
+from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME, AUTH_COOKIE_NAME
 
 router = APIRouter()
 templates = Jinja2Templates(directory="interviewer/templates")
 
 
-SESSION_COOKIE_NAME = "live_coding_session"
-
-
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):
+    access_token = request.cookies.get(AUTH_COOKIE_NAME)
+    if access_token is None:
+        return RedirectResponse("/login")
+
+    try:
+        await google_auth(access_token)
+    except HTTPException:
+        return RedirectResponse("/login")
+
+    loguru.logger.info(f"Logged in with token: {access_token}")
+
     if session_id := request.cookies.get(SESSION_COOKIE_NAME):
         if await redis.hexists(SESSIONS, session_id):
             return RedirectResponse(f"/{session_id}")

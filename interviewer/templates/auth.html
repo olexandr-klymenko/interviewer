@@ -10,15 +10,8 @@
 <div id="my-signin2"></div>
 <script>
     function onSuccess(googleUser) {
-        console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
         let profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId());
-        console.log('Full Name: ' + profile.getName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
-
         let id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);
 
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://{{ DOMAIN }}/google/auth');
@@ -28,12 +21,9 @@
         };
         xhr.send(JSON.stringify({
                 'token': id_token,
-                "avatar": profile.getImageUrl(),
                 "email": profile.getEmail(),
-                "username": profile.getName()
             })
         );
-
     }
 
     function onFailure(error) {
