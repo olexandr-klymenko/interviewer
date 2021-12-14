@@ -1,9 +1,34 @@
-{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Online code interview</title>
+</head>
 <body>
-<button id="Start">Start editor</button>
-<script type="text/javascript">
-    document.getElementById("Start").onclick = function () {
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<div id="g_id_onload"
+     data-client_id="{{ GOOGLE_CLIENT_ID }}"
+     data-context="signin"
+     data-login_uri="/google/auth">
+</div>
+
+<div class="g_id_signin"
+     data-type="standard"
+     data-shape="pill"
+     data-theme="outline"
+     data-text="signin_with"
+     data-size="large"
+     data-locale="en"
+     data-logo_alignment="left">
+</div>
+
+<div>
+    <button id="goToEditor" onclick="goToEditor()" disabled>Start editor</button>
+</div>
+<script>
+    function goToEditor() {
         location.href = "/{{ session_id }}/";
-    };
+    }
 </script>
-{% include 'footer.html' %}
+</body>
+</html>

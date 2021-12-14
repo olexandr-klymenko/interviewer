@@ -1,12 +1,15 @@
 from uuid import uuid4
 
 import loguru
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Form
+import starlette.status as status
+
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewer.cache import redis
-from interviewer.routers.user.services import google_auth
+from interviewer.config import config
+from interviewer.google_auth import google_auth_verify_token
 from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME, AUTH_COOKIE_NAME
 
 router = APIRouter()
@@ -15,34 +18,40 @@ templates = Jinja2Templates(directory="interviewer/templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    access_token = request.cookies.get(AUTH_COOKIE_NAME)
-    if access_token is None:
-        return RedirectResponse("/login")
+    if access_token := request.cookies.get(AUTH_COOKIE_NAME):
+        try:
+            await google_auth_verify_token(access_token)
+            loguru.logger.info(f"Logged in with token: {access_token}")
+        except HTTPException:
+            access_token = None
 
-    try:
-        await google_auth(access_token)
-    except HTTPException:
-        return RedirectResponse("/login")
+    session_id = None
+    if access_token:
+        if session_id := request.cookies.get(SESSION_COOKIE_NAME):
+            if await redis.hexists(SESSIONS, session_id):
+                return RedirectResponse(f"/{session_id}")
 
-    loguru.logger.info(f"Logged in with token: {access_token}")
+        session_id = str(uuid4())
+        await redis.hset(SESSIONS, session_id, "")
 
-    if session_id := request.cookies.get(SESSION_COOKIE_NAME):
-        if await redis.hexists(SESSIONS, session_id):
-            return RedirectResponse(f"/{session_id}")
-
-    session_id = str(uuid4())
-    await redis.hset(SESSIONS, session_id, "")
     page = templates.TemplateResponse(
-        "index.html", context={"request": request, "session_id": session_id}
+        "index.html",
+        context={
+            "request": request,
+            "session_id": session_id,
+            "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
+            "DOMAIN": request.url.hostname,
+        },
     )
-    page.set_cookie(
-        SESSION_COOKIE_NAME,
-        value=session_id,
-        domain=request.url.hostname,
-        httponly=True,
-        max_age=1800,
-        expires=1800,
-    )
+    if session_id:
+        page.set_cookie(
+            SESSION_COOKIE_NAME,
+            value=session_id,
+            domain=request.url.hostname,
+            httponly=True,
+            max_age=1800,
+            expires=1800,
+        )
     return page
 
 
@@ -54,3 +63,18 @@ async def editor(request: Request, session_id: str):
         )
         return page
     return RedirectResponse("/")
+
+
+@router.post("/google/auth")
+async def google_auth(request: Request, credential: str = Form(...)):
+    await google_auth_verify_token(credential)
+    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(
+        AUTH_COOKIE_NAME,
+        value=credential,
+        domain=request.url.hostname,
+        httponly=True,
+        max_age=1800,
+        expires=1800,
+    )
+    return response
