@@ -1,8 +1,8 @@
-.run_button, .execution_time, .python_version, .code, .output{
+.run_button, .home_button, .execution_time, .python_version, .code, .output{
     border-radius: 5px;
 }
 
-.run_button, .execution_time, .python_version{
+.run_button, .home_button, .execution_time, .python_version{
     margin-bottom: 3px;
 }
 

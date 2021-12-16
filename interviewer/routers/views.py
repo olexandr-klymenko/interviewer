@@ -16,42 +16,37 @@ router = APIRouter()
 templates = Jinja2Templates(directory="interviewer/templates")
 
 
-@router.get("/", response_class=HTMLResponse)
-async def root(request: Request):
+@router.get("/home", response_class=HTMLResponse)
+async def home(request: Request):
     if access_token := request.cookies.get(AUTH_COOKIE_NAME):
         try:
             await google_auth_verify_token(access_token)
             loguru.logger.info(f"Logged in with token: {access_token}")
         except HTTPException:
-            access_token = None
+            return RedirectResponse("/")
 
-    session_id = None
-    if access_token:
-        if session_id := request.cookies.get(SESSION_COOKIE_NAME):
-            if await redis.hexists(SESSIONS, session_id):
-                return RedirectResponse(f"/{session_id}")
+    if session_id := request.cookies.get(SESSION_COOKIE_NAME):
+        if await redis.hexists(SESSIONS, session_id):
+            return RedirectResponse(f"/{session_id}")
 
-        session_id = str(uuid4())
-        await redis.hset(SESSIONS, session_id, "")
+    session_id = str(uuid4())
+    await redis.hset(SESSIONS, session_id, "")
 
     page = templates.TemplateResponse(
         "index.html",
         context={
             "request": request,
-            "session_id": session_id,
-            "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
-            "DOMAIN": request.url.hostname,
+            "SESSION_ID": session_id,
         },
     )
-    if session_id:
-        page.set_cookie(
-            SESSION_COOKIE_NAME,
-            value=session_id,
-            domain=request.url.hostname,
-            httponly=True,
-            max_age=1800,
-            expires=1800,
-        )
+    page.set_cookie(
+        SESSION_COOKIE_NAME,
+        value=session_id,
+        domain=request.url.hostname,
+        httponly=True,
+        max_age=1800,
+        expires=1800,
+    )
     return page
 
 
@@ -62,13 +57,30 @@ async def editor(request: Request, session_id: str):
             "editor.html", context={"request": request, "session_id": session_id}
         )
         return page
-    return RedirectResponse("/")
+    return RedirectResponse("/home")
+
+
+@router.get("/", response_class=HTMLResponse)
+async def auth(request: Request):
+    if access_token := request.cookies.get(AUTH_COOKIE_NAME):
+        await google_auth_verify_token(access_token)
+        loguru.logger.info(f"Logged in with token: {access_token}")
+
+    page = templates.TemplateResponse(
+        "auth.html",
+        context={
+            "request": request,
+            "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
+            "DOMAIN": request.url.hostname,
+        },
+    )
+    return page
 
 
 @router.post("/google/auth")
 async def google_auth(request: Request, credential: str = Form(...)):
     await google_auth_verify_token(credential)
-    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse("/home", status_code=status.HTTP_302_FOUND)
     response.set_cookie(
         AUTH_COOKIE_NAME,
         value=credential,

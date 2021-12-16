@@ -38,4 +38,5 @@ async def check_redis():
 if __name__ == "__main__":
     # TODO: Remove code below as soon as PyCharm FastAPI run configuration in debug mode resolved
     import uvicorn
+
     uvicorn.Server(uvicorn.Config(app=app)).run()

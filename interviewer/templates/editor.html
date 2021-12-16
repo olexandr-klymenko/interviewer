@@ -4,6 +4,7 @@
         <button class="run_button" id="run_button">RUN</button>
         <input class="execution_time" disabled id="time" >
         <input class="python_version" disabled id="python_version">
+        <button class="home_button" id="home_button" onclick="goHome()">HOME</button>
     </div>
     <div class="div">
         <textarea class="code" id="code"></textarea>
@@ -13,4 +14,9 @@
     </div>
 </div>
 <script src="{{ url_for('static', path='/js/editor.js') }}"></script>
+<script>
+    function goHome() {
+        location.href = "/";
+    }
+</script>
 {% include 'footer.html' %}
