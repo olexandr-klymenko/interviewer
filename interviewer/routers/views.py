@@ -36,6 +36,7 @@ async def home(request: Request):
         "index.html",
         context={
             "request": request,
+            "DOMAIN": f"{request.url.hostname}:{request.url.port}",
             "SESSION_ID": session_id,
         },
     )
@@ -54,7 +55,11 @@ async def home(request: Request):
 async def editor(request: Request, session_id: str):
     if await redis.hexists(SESSIONS, session_id):
         page = templates.TemplateResponse(
-            "editor.html", context={"request": request, "session_id": session_id}
+            "editor.html",
+            context={
+                "request": request,
+                "DOMAIN": f"{request.url.hostname}:{request.url.port}",
+            },
         )
         return page
     return RedirectResponse("/home")
@@ -71,7 +76,7 @@ async def auth(request: Request):
         context={
             "request": request,
             "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
-            "DOMAIN": request.url.hostname,
+            "DOMAIN": f"{request.url.hostname}:{request.url.port}",
         },
     )
     return page
