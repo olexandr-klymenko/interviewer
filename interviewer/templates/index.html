@@ -1,10 +1,19 @@
-{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online code interview</title>
+    <link href="{{ url_for('static', path='/images/favicon.ico') }}" rel="icon" type="image/x-icon">
+    <link href="{{ url_for('static', path='/css/editor.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body>
 <div>
     <button id="goToEditor" onclick="goToEditor()">Start editor</button>
 </div>
 <script>
     function goToEditor() {
-        location.href = "http://{{ DOMAIN }}/{{ SESSION_ID }}/";
+        location.href = "/editor/?session_id={{ SESSION_ID }}/";
     }
 </script>
-{% include 'footer.html' %}
+</body>
+</html>

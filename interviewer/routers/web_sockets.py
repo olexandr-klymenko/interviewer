@@ -11,7 +11,7 @@ from interviewer.sessions import editor_sessions, output_sessions
 router = APIRouter()
 
 
-@router.websocket("/editor_ws")
+@router.websocket("/editor")
 async def editor_web_socket(websocket: WebSocket, session_id: str):
     socket_id = str(uuid4())
     await editor_sessions.connect(
@@ -34,7 +34,7 @@ async def editor_web_socket(websocket: WebSocket, session_id: str):
         editor_sessions.disconnect(session_id=session_id, socket_id=socket_id)
 
 
-@router.websocket("/output_ws")
+@router.websocket("/output")
 async def output_web_socket(websocket: WebSocket, session_id: str):
     socket_id = str(uuid4())
     await output_sessions.connect(

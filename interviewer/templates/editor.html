@@ -1,22 +1,102 @@
-{% include 'header.html' %}
-<div>
-    <div class="div">
-        <button class="run_button" id="run_button">RUN</button>
-        <input class="execution_time" disabled id="time" >
-        <input class="python_version" disabled id="python_version">
-        <button class="home_button" id="home_button" onclick="goHome()">HOME</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online code interview</title>
+    <link href="{{ url_for('static', path='/images/favicon.ico') }}" rel="icon" type="image/x-icon">
+    <link href="{{ url_for('static', path='/css/editor.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body onload="startEditor()">
+    <div>
+        <div class="div">
+            <button class="run_button" id="run_button">RUN</button>
+            <input class="execution_time" disabled id="time" >
+            <input class="python_version" disabled id="python_version">
+            <button class="home_button" id="home_button" onclick="goHome()">HOME</button>
+        </div>
+        <div class="div">
+            <textarea class="code" id="code"></textarea>
+        </div>
+        <div class="div">
+            <textarea class="output" disabled id="output"></textarea>
+        </div>
     </div>
-    <div class="div">
-        <textarea class="code" id="code"></textarea>
-    </div>
-    <div class="div">
-        <textarea class="output" disabled id="output"></textarea>
-    </div>
-</div>
-<script src="{{ url_for('static', path='/js/editor.js') }}"></script>
-<script>
-    function goHome() {
-        location.href = "http://{{ DOMAIN }}/auth";
-    }
-</script>
-{% include 'footer.html' %}
+    <script>
+        const EDITOR_ID = "code";
+        const OUTPUT_ID = "output";
+        const TIME_ID = "time";
+        const PYTHON_VERSION_ID = "python_version";
+        const RUN_BUTTON_ID = "run_button";
+
+        const WS_ROOT = "{{ WS_PROTOCOL }}://{{ DOMAIN }}/ws";
+        const EDITOR_WS_URL = WS_ROOT + "/editor";
+        const OUTPUT_WS_URL = WS_ROOT + "/output";
+        const EXECUTE_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/run/";
+        const PYTHON_VERSION_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/python_version/";
+
+
+        function startEditor() {
+            let editorTextarea = document.getElementById(EDITOR_ID);
+            let outputTextarea = document.getElementById(OUTPUT_ID);
+            let timeInput = document.getElementById(TIME_ID)
+            let pythonVersionInput = document.getElementById(PYTHON_VERSION_ID)
+            let runButton = document.getElementById(RUN_BUTTON_ID);
+            let editorSocket = new WebSocket(EDITOR_WS_URL + "?session_id={{ SESSION_ID }}");
+            let outputSocket = new WebSocket(OUTPUT_WS_URL + "?session_id={{ SESSION_ID }}");
+
+            let init = {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'default'
+                };
+                let pythonVersionRequest = new Request(PYTHON_VERSION_URL + "{{ SESSION_ID }}", init);
+                fetch(pythonVersionRequest).then(function (response) {
+                    return response.text()
+                }).then((data) => {
+                    pythonVersionInput.value = data
+                });
+
+            let incomeText = "";
+
+            editorSocket.onmessage = (event) => {
+                let code = event.data
+                incomeText = code;
+                editorTextarea.value = code;
+            }
+
+            editorSocket.onclose = () => {
+                runButton.disabled = true;
+            }
+
+            editorTextarea.onchange = () => {
+                editorSocket.send(editorTextarea.value)
+            }
+
+            outputSocket.onmessage = (event) => {
+                let executionInfo = JSON.parse(event.data);
+                outputTextarea.value = executionInfo.output;
+                timeInput.value = executionInfo.time.toString();
+            }
+
+            runButton.onclick = () => {
+                runButton.disabled = true;
+                editorTextarea.disabled = true;
+                let init = {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'default'
+                };
+                let executionRequest = new Request(EXECUTE_URL + "{{ SESSION_ID }}", init);
+                fetch(executionRequest).then(function (response) {
+                    runButton.disabled = false;
+                    editorTextarea.disabled = false;
+                });
+            }
+        }
+
+        function goHome() {
+            location.href = "{{ API_PROTOCOL }}://{{ DOMAIN }}/auth";
+        }
+    </script>
+</body>
+</html>

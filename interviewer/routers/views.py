@@ -1,14 +1,14 @@
 from uuid import uuid4
 
 import loguru
-from fastapi import APIRouter, Request, HTTPException, Form
+from fastapi import APIRouter, Request, HTTPException, Form, Query
 import starlette.status as status
 
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewer.cache import redis
-from interviewer.config import config
+from interviewer.config import config, DEFAULT_API_PROTOCOL, DEFAULT_WS_PROTOCOL
 from interviewer.google_auth import google_auth_verify_token
 from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME, AUTH_COOKIE_NAME
 
@@ -28,7 +28,8 @@ async def home(request: Request):
         return RedirectResponse("/auth")
 
     if session_id := request.cookies.get(SESSION_COOKIE_NAME):
-        return RedirectResponse(f"/{session_id}")
+        if await redis.hexists(SESSIONS, session_id):
+            return RedirectResponse(f"/editor?session_id={session_id}")
 
     session_id = str(uuid4())
     await redis.hset(SESSIONS, session_id, "")
@@ -52,19 +53,21 @@ async def home(request: Request):
     return page
 
 
-@router.get("/{session_id}/", response_class=HTMLResponse)
-async def editor(request: Request, session_id: str):
+@router.get("/editor", response_class=HTMLResponse)
+async def editor(request: Request, session_id: str = Query):
     page = templates.TemplateResponse(
         "editor.html",
         context={
             "request": request,
+            "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
+            "WS_PROTOCOL": config.get("WS_PROTOCOL", default=DEFAULT_WS_PROTOCOL),
             "DOMAIN": f"{request.url.hostname}:{request.url.port}",
+            "SESSION_ID": session_id,
         },
     )
     if await redis.hexists(SESSIONS, session_id):
         return page
 
-    page.delete_cookie(key=SESSION_COOKIE_NAME)
     return RedirectResponse("/")
 
 
@@ -75,6 +78,7 @@ async def auth(request: Request):
         context={
             "request": request,
             "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
+            "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
             "DOMAIN": f"{request.url.hostname}:{request.url.port}",
         },
     )

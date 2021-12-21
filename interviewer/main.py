@@ -23,7 +23,7 @@ app.add_middleware(SessionMiddleware, secret_key="secret-string")
 app.mount("/static", StaticFiles(directory="interviewer/static"), name="static")
 app.include_router(execution_router)
 app.include_router(views_router)
-app.include_router(websockets_router)
+app.include_router(websockets_router, prefix="/ws")
 
 
 @app.on_event("startup")
