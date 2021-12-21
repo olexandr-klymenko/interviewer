@@ -49,7 +49,7 @@
                     mode: 'cors',
                     cache: 'default'
                 };
-                let pythonVersionRequest = new Request(PYTHON_VERSION_URL + "{{ SESSION_ID }}", init);
+                let pythonVersionRequest = new Request(PYTHON_VERSION_URL, init);
                 fetch(pythonVersionRequest).then(function (response) {
                     return response.text()
                 }).then((data) => {
@@ -86,7 +86,7 @@
                     mode: 'cors',
                     cache: 'default'
                 };
-                let executionRequest = new Request(EXECUTE_URL + "{{ SESSION_ID }}", init);
+                let executionRequest = new Request(EXECUTE_URL, init);
                 fetch(executionRequest).then(function (response) {
                     runButton.disabled = false;
                     editorTextarea.disabled = false;

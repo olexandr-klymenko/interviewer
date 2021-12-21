@@ -38,6 +38,7 @@ async def home(request: Request):
         "index.html",
         context={
             "request": request,
+            "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
             "DOMAIN": f"{request.url.hostname}:{request.url.port}",
             "SESSION_ID": session_id,
         },
