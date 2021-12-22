@@ -1,12 +1,17 @@
 * implement github actions for deployment
-* README documentation for local deployment
+* README documentation for local and cloud deployment
 * implement integration and e2e testing
 * limit memory consumption of execution
 * implement readonly/readwrite access to the editor
 * extract execution into separate service with redis pubsub
-* implement Google SSO
 * implement syntax highlighting
 * implement code completion
 * handle disconnect
-* implement HTTPS
 * implement git hooks with linters
+* implement storing users in database
+* implement storing multiple sessions in database
+* implement middleware for authentication
+* implement js versioning for prevent caching
+* implement button for copying session_id
+* implement cloud deployment script/s
+* apply more style to frontend
