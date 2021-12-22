@@ -8,7 +8,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewer.cache import redis
-from interviewer.config import config, DEFAULT_API_PROTOCOL, DEFAULT_WS_PROTOCOL
+from interviewer.config import (
+    config,
+    DEFAULT_API_PROTOCOL,
+    DEFAULT_WS_PROTOCOL,
+    DEFAULT_DOMAIN,
+)
 from interviewer.google_auth import google_auth_verify_token
 from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME, AUTH_COOKIE_NAME
 
@@ -39,14 +44,14 @@ async def home(request: Request):
         context={
             "request": request,
             "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
-            "DOMAIN": f"{request.url.hostname}:{request.url.port}",
+            "DOMAIN": config.get("DOMAIN", default=DEFAULT_DOMAIN),
             "SESSION_ID": session_id,
         },
     )
     page.set_cookie(
         SESSION_COOKIE_NAME,
         value=session_id,
-        domain=request.url.hostname,
+        domain=config.get("DOMAIN", default=DEFAULT_DOMAIN),
         httponly=True,
         max_age=1800,
         expires=1800,
@@ -62,7 +67,7 @@ async def editor(request: Request, session_id: str = Query):
             "request": request,
             "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
             "WS_PROTOCOL": config.get("WS_PROTOCOL", default=DEFAULT_WS_PROTOCOL),
-            "DOMAIN": f"{request.url.hostname}:{request.url.port}",
+            "DOMAIN": config.get("DOMAIN", default=DEFAULT_DOMAIN),
             "SESSION_ID": session_id,
         },
     )
@@ -80,20 +85,20 @@ async def auth(request: Request):
             "request": request,
             "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
             "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
-            "DOMAIN": f"{request.url.hostname}:{request.url.port}",
+            "DOMAIN": config.get("DOMAIN", default=DEFAULT_DOMAIN),
         },
     )
     return page
 
 
 @router.post("/google/auth")
-async def google_auth(request: Request, credential: str = Form(...)):
+async def google_auth(credential: str = Form(...)):
     await google_auth_verify_token(credential)
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(
         AUTH_COOKIE_NAME,
         value=credential,
-        domain=request.url.hostname,
+        domain=config.get("DOMAIN", default=DEFAULT_DOMAIN),
         httponly=True,
         max_age=1800,
         expires=1800,
