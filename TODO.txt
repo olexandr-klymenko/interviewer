@@ -10,9 +10,10 @@
 * implement git hooks with linters
 * implement storing users in database
 * implement storing multiple sessions in database
-* implement middleware for authentication
 * implement js versioning for prevent caching
 * implement button for copying session_id
 * implement cloud deployment script/s
 * apply more style to frontend
 * implement version for mobile browsers
+* implement middleware for authentication - WIP
+* implement staging environment

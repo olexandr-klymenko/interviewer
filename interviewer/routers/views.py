@@ -51,7 +51,6 @@ async def home(request: Request):
     page.set_cookie(
         SESSION_COOKIE_NAME,
         value=session_id,
-        domain=config.get("DOMAIN", default=DEFAULT_DOMAIN),
         httponly=True,
         max_age=1800,
         expires=1800,
@@ -98,7 +97,6 @@ async def google_auth(credential: str = Form(...)):
     response.set_cookie(
         AUTH_COOKIE_NAME,
         value=credential,
-        domain=config.get("DOMAIN", default=DEFAULT_DOMAIN),
         httponly=True,
         max_age=1800,
         expires=1800,

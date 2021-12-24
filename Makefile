@@ -16,7 +16,9 @@ down:
 
 restart:
 	docker-compose $(ENV_CONFIG) rm -f -s interviewer
+	docker-compose $(ENV_CONFIG) stop nginx
 	$(HIDE_DOCKER_CLI_DETAILES) docker-compose $(ENV_CONFIG) build interviewer
+	docker-compose $(ENV_CONFIG) start nginx
 	docker-compose $(ENV_CONFIG) up -d interviewer
 
 logs:
