@@ -3,3 +3,4 @@
 /interviewer/.env
 /sqlite.db
 __pycache__
+data/certbot
