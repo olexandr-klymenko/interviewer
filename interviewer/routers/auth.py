@@ -5,14 +5,14 @@ from starlette.responses import HTMLResponse, RedirectResponse
 
 from interviewer.config import config, DEFAULT_API_PROTOCOL, DEFAULT_DOMAIN
 from interviewer.constants import AUTH_COOKIE_NAME
-from interviewer.google_auth import google_auth_verify_token
+from interviewer.auth import google_auth_verify_token
 from interviewer.routers import templates
 
 router = APIRouter()
 
 
 @router.get("/", response_class=HTMLResponse)
-async def auth(request: Request, referer: str = Header(default="/")):
+async def auth(request: Request, referer: str = Query("/")):
     page = templates.TemplateResponse(
         "auth.html",
         context={

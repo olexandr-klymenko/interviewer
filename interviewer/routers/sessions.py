@@ -1,6 +1,4 @@
-import loguru
-from fastapi import Query, HTTPException, APIRouter
-from fastapi.requests import Request
+from fastapi import Query, APIRouter
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import Response
@@ -12,10 +10,9 @@ from interviewer.config import (
     DEFAULT_WS_PROTOCOL,
     DEFAULT_DOMAIN,
 )
-from interviewer.constants import AUTH_COOKIE_NAME, SESSION_COOKIE_NAME, SESSIONS
-from interviewer.google_auth import google_auth_verify_token
-from interviewer.routers import templates
+from interviewer.constants import SESSION_COOKIE_NAME, SESSIONS
 from interviewer.execution import execute
+from interviewer.routers import templates
 from interviewer.sessions import output_sessions
 
 router = APIRouter()
@@ -23,15 +20,6 @@ router = APIRouter()
 
 @router.get("/{session_id}/", response_class=HTMLResponse)
 async def sessions(request: Request, session_id: str = Query):
-    if access_token := request.cookies.get(AUTH_COOKIE_NAME):
-        try:
-            await google_auth_verify_token(access_token)
-            loguru.logger.info(f"Logged in with token: {access_token}")
-        except HTTPException:
-            return RedirectResponse(f"/auth")
-    else:
-        return RedirectResponse(f"/auth")
-
     page = templates.TemplateResponse(
         "editor.html",
         context={

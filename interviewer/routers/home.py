@@ -1,7 +1,6 @@
 from uuid import uuid4
 
-import loguru
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
 
 from fastapi.responses import HTMLResponse, RedirectResponse
 
@@ -11,8 +10,7 @@ from interviewer.config import (
     DEFAULT_API_PROTOCOL,
     DEFAULT_DOMAIN,
 )
-from interviewer.google_auth import google_auth_verify_token
-from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME, AUTH_COOKIE_NAME
+from interviewer.constants import SESSIONS, SESSION_COOKIE_NAME
 from interviewer.routers import templates
 
 router = APIRouter()
@@ -20,15 +18,6 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    if access_token := request.cookies.get(AUTH_COOKIE_NAME):
-        try:
-            await google_auth_verify_token(access_token)
-            loguru.logger.info(f"Logged in with token: {access_token}")
-        except HTTPException:
-            return RedirectResponse(f"/auth")
-    else:
-        return RedirectResponse(f"/auth")
-
     if session_id := request.cookies.get(SESSION_COOKIE_NAME):
         if await redis.hexists(SESSIONS, session_id):
             return RedirectResponse(f"/sessions/{session_id}")
