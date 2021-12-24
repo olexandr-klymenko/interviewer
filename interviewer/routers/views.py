@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 import loguru
-from fastapi import APIRouter, Request, HTTPException, Form, Query
+from fastapi import APIRouter, Request, HTTPException, Form, Query, Header
 import starlette.status as status
 
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -28,9 +28,9 @@ async def home(request: Request):
             await google_auth_verify_token(access_token)
             loguru.logger.info(f"Logged in with token: {access_token}")
         except HTTPException:
-            return RedirectResponse("/auth")
+            return RedirectResponse(f"/auth")
     else:
-        return RedirectResponse("/auth")
+        return RedirectResponse(f"/auth")
 
     if session_id := request.cookies.get(SESSION_COOKIE_NAME):
         if await redis.hexists(SESSIONS, session_id):
@@ -60,6 +60,17 @@ async def home(request: Request):
 
 @router.get("/editor", response_class=HTMLResponse)
 async def editor(request: Request, session_id: str = Query):
+    if access_token := request.cookies.get(AUTH_COOKIE_NAME):
+        try:
+            await google_auth_verify_token(access_token)
+            loguru.logger.info(f"Logged in with token: {access_token}")
+        except HTTPException:
+            return RedirectResponse(
+                f"/auth"
+            )
+    else:
+        return RedirectResponse(f"/auth")
+
     page = templates.TemplateResponse(
         "editor.html",
         context={
@@ -70,6 +81,16 @@ async def editor(request: Request, session_id: str = Query):
             "SESSION_ID": session_id,
         },
     )
+
+    if session_id != request.cookies.get(SESSION_COOKIE_NAME):
+        page.set_cookie(
+            SESSION_COOKIE_NAME,
+            value=session_id,
+            httponly=True,
+            max_age=1800,
+            expires=1800,
+        )
+
     if await redis.hexists(SESSIONS, session_id):
         return page
 
@@ -77,7 +98,7 @@ async def editor(request: Request, session_id: str = Query):
 
 
 @router.get("/auth", response_class=HTMLResponse)
-async def auth(request: Request):
+async def auth(request: Request, referer: str = Header(default="/")):
     page = templates.TemplateResponse(
         "auth.html",
         context={
@@ -85,15 +106,16 @@ async def auth(request: Request):
             "GOOGLE_CLIENT_ID": config.get("GOOGLE_CLIENT_ID"),
             "API_PROTOCOL": config.get("API_PROTOCOL", default=DEFAULT_API_PROTOCOL),
             "DOMAIN": config.get("DOMAIN", default=DEFAULT_DOMAIN),
+            "REFERER": referer,
         },
     )
     return page
 
 
 @router.post("/google/auth")
-async def google_auth(credential: str = Form(...)):
+async def google_auth(credential: str = Form(...), referer: str = Query(default="/")):
     await google_auth_verify_token(credential)
-    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse(referer, status_code=status.HTTP_302_FOUND)
     response.set_cookie(
         AUTH_COOKIE_NAME,
         value=credential,
