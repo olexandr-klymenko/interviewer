@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from interviewer.routers.execution import router as execution_router
-from interviewer.routers.views import router as views_router
+from interviewer.routers.home import router as views_router
+from interviewer.routers.sessions import router as sessions_router
+from interviewer.routers.auth import router as auth_router
 from interviewer.routers.web_sockets import router as websockets_router
 from interviewer.cache import redis
 
@@ -21,8 +22,9 @@ app.add_middleware(
 )
 app.add_middleware(SessionMiddleware, secret_key="secret-string")
 app.mount("/static", StaticFiles(directory="interviewer/static"), name="static")
-app.include_router(execution_router)
 app.include_router(views_router)
+app.include_router(sessions_router, prefix="/sessions")
+app.include_router(auth_router, prefix="/auth")
 app.include_router(websockets_router, prefix="/ws")
 
 

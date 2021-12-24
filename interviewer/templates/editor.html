@@ -31,8 +31,8 @@
         const WS_ROOT = "{{ WS_PROTOCOL }}://{{ DOMAIN }}/ws";
         const EDITOR_WS_URL = WS_ROOT + "/editor";
         const OUTPUT_WS_URL = WS_ROOT + "/output";
-        const EXECUTE_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/run/";
-        const PYTHON_VERSION_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/python_version/";
+        const EXECUTE_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/sessions/{{ SESSION_ID }}/run/";
+        const PYTHON_VERSION_URL = "{{ API_PROTOCOL }}://{{ DOMAIN }}/sessions/{{ SESSION_ID }}/python_version/";
 
 
         function startEditor() {
