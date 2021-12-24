@@ -1,6 +1,6 @@
 * implement github actions for deployment
 * README documentation for local and cloud deployment
-* implement integration and e2e testing
+* implement integration, e2e testing
 * limit memory consumption of execution
 * implement readonly/readwrite access to the editor
 * extract execution into separate service with redis pubsub
@@ -15,5 +15,9 @@
 * implement cloud deployment script/s
 * apply more style to frontend
 * implement version for mobile browsers
-* implement middleware for authentication - WIP
+* implement middleware for authentication
+* implement issuing internal tokens instead of google ones
 * implement staging environment
+* implement session joining approval
+* implement reconnect
+* implement logging and metrics gathering on the cloud
