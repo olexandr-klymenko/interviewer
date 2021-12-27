@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import Response
 
-from interviewer.cache import redis
+from interviewer.services.cache import redis
 from interviewer.config import (
     config,
     DEFAULT_API_PROTOCOL,
@@ -11,9 +11,9 @@ from interviewer.config import (
     DEFAULT_DOMAIN,
 )
 from interviewer.constants import SESSION_COOKIE_NAME, SESSIONS
-from interviewer.execution import execute
+from interviewer.services.execution import execute
 from interviewer.routers import templates
-from interviewer.sessions import output_sessions
+from interviewer.services.sessions import output_sessions
 
 router = APIRouter()
 

@@ -1,11 +1,11 @@
-from fastapi import Header, APIRouter, Form, Query
+from fastapi import APIRouter, Form, Query
 from starlette import status as status
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from interviewer.config import config, DEFAULT_API_PROTOCOL, DEFAULT_DOMAIN
 from interviewer.constants import AUTH_COOKIE_NAME
-from interviewer.auth import google_auth_verify_token
+from interviewer.services.auth import google_auth_verify_token
 from interviewer.routers import templates
 
 router = APIRouter()

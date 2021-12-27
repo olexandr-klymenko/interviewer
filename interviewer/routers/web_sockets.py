@@ -3,9 +3,9 @@ from uuid import uuid4
 from fastapi import WebSocketDisconnect, WebSocket, APIRouter
 from loguru import logger
 
-from interviewer.cache import redis
+from interviewer.services.cache import redis
 from interviewer.constants import SESSIONS
-from interviewer.sessions import editor_sessions, output_sessions
+from interviewer.services.sessions import editor_sessions, output_sessions
 
 
 router = APIRouter()

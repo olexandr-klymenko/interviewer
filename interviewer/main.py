@@ -7,8 +7,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from interviewer.auth import is_authenticated
-from interviewer.cache import redis
+from interviewer.services.auth import is_authenticated
+from interviewer.services.cache import redis
 from interviewer.constants import AUTH_COOKIE_NAME
 from interviewer.routers.auth import router as auth_router
 from interviewer.routers.home import router as views_router

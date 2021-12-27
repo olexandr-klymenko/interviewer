@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request
 
 from fastapi.responses import HTMLResponse, RedirectResponse
 
-from interviewer.cache import redis
+from interviewer.services.cache import redis
 from interviewer.config import (
     config,
     DEFAULT_API_PROTOCOL,
